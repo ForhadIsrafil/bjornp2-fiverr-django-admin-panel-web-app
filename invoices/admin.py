@@ -6,14 +6,19 @@ from django.urls import reverse
 from django.utils.http import urlencode
 
 
+class LineItemAdmin(admin.StackedInline):
+    model = LineItem
+    readonly_fields = ["invoice_id", "ledger_account_id"]
+    extra = 1
+
+
 @admin.register(Invoice)
 class InvoicesAdmin(admin.ModelAdmin):
-    list_display = ["id", "invoice_number", "invoice_date", "invoice_date_sent", "number_of_units",
-                    "amount_per_unit_value", "get_updated_data"]
-    search_fields = ["id", "invoice_number", "invoice_date", "invoice_due_date", "invoice_delivery_period",
+    list_display = ["invoice_id", "invoice_number", "invoice_date", "invoice_date_sent", "get_updated_data"]
+    search_fields = ["invoice_id", "invoice_number", "invoice_date", "invoice_due_date", "invoice_delivery_period",
                      "invoice_date_sent", ]
-    readonly_fields = ["invoice_id", "invoice_number", "ledger_account_id"]
-    actions = []
+    readonly_fields = ["invoice_id", "invoice_number"]
+    inlines = [LineItemAdmin]
 
     def get_updated_data(self, obj):
         url = "http://127.0.0.1:8000/get-updated-data"
