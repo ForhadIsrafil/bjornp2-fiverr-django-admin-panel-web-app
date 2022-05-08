@@ -5,6 +5,8 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse
 from django.utils.http import urlencode
 
+# from django.contrib.admin.sites import AdminSite
+# AdminSite.index_template = '../templates/admin/index.html'
 
 class LineItemAdmin(admin.StackedInline):
     model = LineItem
