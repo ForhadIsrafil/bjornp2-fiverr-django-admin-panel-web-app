@@ -10,4 +10,16 @@ def get_updated_data(request):
     return JsonResponse(data={"data": invoice_res}, status=200)
 
 def create_invoice(request):
+    print(request.POST.__dict__)
     return render(request, '../templates/create_invoice.html')
+
+
+
+# description
+# vat_percentage
+# vat
+# units
+# number_of_units
+# amount_per_unit_value
+# amount_per_unit_currency
+# ledger_account_id
