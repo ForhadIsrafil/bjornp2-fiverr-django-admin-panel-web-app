@@ -126,3 +126,5 @@ GRAPPELLI_ADMIN_TITLE = "bjornp2"
 
 LOGIN_URL = config('LOGIN_URL', default='', cast=str)
 INVOICE_URL = config('INVOICE_URL', default='', cast=str)
+CUSTOMER_URL = config('CUSTOMER_URL', default='', cast=str)
+LEDGER_ACCOUNT_URL = config('LEDGER_ACCOUNT_URL', default='', cast=str)

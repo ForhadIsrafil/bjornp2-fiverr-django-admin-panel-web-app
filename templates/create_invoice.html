@@ -6,6 +6,7 @@
     <body class="grp-change-form">
     <header id="grp-content-title">
         <h1>Create Inovice</h1>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     </header>
     <div id="grp-content-container">
         <form class="module grp-module" action="{% url 'invoices:create_invoice' %}" method="post">{% csrf_token %}
@@ -58,19 +59,62 @@
                 <input class="grp-button grp-float-right" type="submit" value="Submit">
             </footer>
         </form>
+        {#        <ul id="searchResult"></ul>#}
     </div>
     </body>
     <script type="text/JavaScript">
+        var ledger_count = 1;
+
         function createNewElement() {
-            // First create a DIV element.
+            // create a DIV element.
             var txtNewInputBox = document.createElement('div');
 
-            // Then add the content (a new input box) of the element.
-            txtNewInputBox.innerHTML = "<label >description:</label> <textarea type='text' name='description'></textarea><br><br> <label >vat_percentage:</label> <input type='text' name='vat_percentage'><br><br> <label >vat:</label> <input type='text' name='vat'><br><br> <label >units:</label> <input type='text' name='units'><br><br> <label >number_of_units:</label> <input type='text' name='number_of_units'><br><br> <label >amount_per_unit_value:</label> <input type='text' name='amount_per_unit_value'><br><br> <label>amount_per_unit_currency:</label> <input type='text' name='amount_per_unit_currency'><br><br> <label >ledger_account_id:</label> <input type='text' name='ledger_account_id'><hr>";
-
-            // Finally put it where it is supposed to appear.
+            // add the content (a new input box) of the element.
+            txtNewInputBox.innerHTML = `<label >description:</label> <textarea type='text' name='description'></textarea><br><br> <label >vat_percentage:</label> <input type='text' name='vat_percentage'><br><br> <label >vat:</label> <input type='text' name='vat'><br><br> <label >units:</label> <input type='text' name='units'><br><br> <label >number_of_units:</label> <input type='text' name='number_of_units'><br><br> <label >amount_per_unit_value:</label> <input type='text' name='amount_per_unit_value'><br><br> <label>amount_per_unit_currency:</label> <input type='text' name='amount_per_unit_currency'><br><br> <label >ledger_account_id:</label> <select name='ledger_account_id' id='ledger_id_${ledger_count}'></select><hr>`;
             document.getElementById("newElementId").appendChild(txtNewInputBox);
+            get_ledger();
+        }
+
+        function get_ledger() {
+            // get ledger accounts ids
+            $.ajax({
+                url: '{% url 'invoices:get_ledger_acc' %}',
+                type: 'get',
+                success: function (response) {
+                    var lid = '#ledger_id_' + ledger_count.toString();
+                    console.log(lid);
+                    console.log(response['data']);
+                    var len = response['data'].length;
+                    for (var i = 0; i < len; i++) {
+                        var id = response['data'][i];
+                        {#console.log(id)#}
+
+                        {#$("#ledger_id").append("<li value='" + id + "'>" + id + "</li>");#}
+                        {#$(`#ledger_id_${ledger_count}`).append(`<option value=${id}>${id}</option>`);#}
+                        $(lid).append($('<option>').val(id).text(id));
+                    }
+                    ledger_count += 1;
+
+                }
+            });
         }
     </script>
-
+    {#        <script>#}
+    {#            window.onload = $.ajax({#}
+    {#                url: '{% url 'invoices:get_ledger_acc' %}',#}
+    {#                type: 'get',#}
+    {#                success: function (response) {#}
+    {#                    console.log(response['data']);#}
+    {#                    var len = response['data'].length;#}
+    {#                    for (var i = 0; i < len; i++) {#}
+    {#                        var id = response['data'][i];#}
+    {#                        console.log(id)#}
+    {##}
+    {#$("#ledger_id").append("<li value='" + id + "'>" + id + "</li>");#}
+    {#                        $("#ledger_id").append("<option value='" + id + "'>" + id + "</option>");#}
+    {##}
+    {#                    }#}
+    {#                }#}
+    {#            });#}
+    {#        </script>#}
 {% endblock %}
