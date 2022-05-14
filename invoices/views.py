@@ -12,7 +12,7 @@ def get_updated_data(request):
 
 
 def create_invoice(request):
-    print(request.POST)
+    # print(request.POST)
     return render(request, '../templates/create_invoice.html')
 
 
