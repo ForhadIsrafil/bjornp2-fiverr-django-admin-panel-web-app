@@ -13,7 +13,10 @@
             <div class="form-row grp-row grp-cells-1">
                 <div class="field-box l-2c-fluid l-d-4">
                     <div class="c-1"><label>customer_id</label></div>
-                    <div class="c-2"><input type="text" name="customer_id" class=" " size="10" required></div>
+                    <div class="c-2">
+                        {#                        <input type="text" name="customer_id" class=" " size="10" required>#}
+                        <select name='customer_id' id='customer_id'></select>
+                    </div>
                 </div>
             </div>
             <div class="form-row grp-row grp-cells-1">
@@ -63,38 +66,58 @@
     </div>
     </body>
     <script type="text/JavaScript">
-        var ledger_count = 1;
+        var counter = 1;
 
         function createNewElement() {
             // create a DIV element.
-            var txtNewInputBox = document.createElement('div');
+            var LedgeerNewInputBox = document.createElement('div');
 
             // add the content (a new input box) of the element.
-            txtNewInputBox.innerHTML = `<label >description:</label> <textarea type='text' name='description'></textarea><br><br> <label >vat_percentage:</label> <input type='text' name='vat_percentage'><br><br> <label >vat:</label> <input type='text' name='vat'><br><br> <label >units:</label> <input type='text' name='units'><br><br> <label >number_of_units:</label> <input type='text' name='number_of_units'><br><br> <label >amount_per_unit_value:</label> <input type='text' name='amount_per_unit_value'><br><br> <label>amount_per_unit_currency:</label> <input type='text' name='amount_per_unit_currency'><br><br> <label >ledger_account_id:</label> <select name='ledger_account_id' id='ledger_id_${ledger_count}'></select><hr>`;
-            document.getElementById("newElementId").appendChild(txtNewInputBox);
+            LedgeerNewInputBox.innerHTML = `<label >description:</label> <textarea type='text' name='description'></textarea><br><br> <label >vat_percentage:</label> <input type='text' name='vat_percentage'><br><br> <label >vat:</label> <input type='text' name='vat'><br><br> <label >units:</label> <input type='text' name='units'><br><br> <label >number_of_units:</label> <input type='text' name='number_of_units'><br><br> <label >amount_per_unit_value:</label> <input type='text' name='amount_per_unit_value'><br><br> <label>amount_per_unit_currency:</label> <input type='text' name='amount_per_unit_currency'><br><br> <label >ledger_account_id:</label> <select name='ledger_account_id' id='ledger_id_${counter}'></select><hr>`;
+            document.getElementById("newElementId").appendChild(LedgeerNewInputBox);
             get_ledger();
         }
 
+        // get list of ledger account
         function get_ledger() {
             // get ledger accounts ids
             $.ajax({
                 url: '{% url 'invoices:get_ledger_acc' %}',
                 type: 'get',
                 success: function (response) {
-                    var lid = '#ledger_id_' + ledger_count.toString();
-                    console.log(lid);
-                    console.log(response['data']);
+                    var lid = '#ledger_id_' + counter.toString();
+                    {#console.log(lid);#}
+                    {#console.log(response['data']);#}
                     var len = response['data'].length;
                     for (var i = 0; i < len; i++) {
-                        var id = response['data'][i];
+                        var name = response['data'][i]['name'];
+                        var id = response['data'][i]['ledger_account_id'];
                         {#console.log(id)#}
 
                         {#$("#ledger_id").append("<li value='" + id + "'>" + id + "</li>");#}
-                        {#$(`#ledger_id_${ledger_count}`).append(`<option value=${id}>${id}</option>`);#}
-                        $(lid).append($('<option>').val(id).text(id));
+                        {#$(`#ledger_id_${counter}`).append(`<option value=${id}>${id}</option>`);#}
+                        $(lid).append($('<option>').val(id).text(name));
                     }
-                    ledger_count += 1;
+                    counter += 1;
 
+                }
+            });
+        }
+    </script>
+    <script>
+        // get list of customers
+        window.onload = function get_customer() {
+            $.ajax({
+                url: '{% url 'invoices:get_customer' %}',
+                type: 'get',
+                success: function (response) {
+                    {#console.log(response['data']);#}
+                    var len = response['data'].length;
+                    for (var i = 0; i < len; i++) {
+                        var customer_name = response['data'][i]['customer_name'];
+                        var id = response['data'][i]['id'];
+                        $(`#customer_id`).append($('<option>').val(id).text(customer_name));
+                    }
                 }
             });
         }

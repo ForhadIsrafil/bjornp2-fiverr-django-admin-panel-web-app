@@ -24,3 +24,8 @@ class LineItem(models.Model):
 
     def __str__(self):
         return self.description
+
+
+class AccessToken(models.Model):
+    token = models.CharField(max_length=255, default="JkVS3-pfHWyfn7qO86Sx0cEsH4Vj3vFV6oC_Y5e4gTs", null=True,
+                             blank=True)
