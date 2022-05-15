@@ -2,7 +2,7 @@ import requests
 import json
 from django.conf import settings
 from .models import *
-
+from datetime import datetime
 
 def get_customers():
     # todo: get access token
@@ -62,12 +62,75 @@ def get_access_token():
     if login_res.status_code == 200:
         login_data = login_res.json()
         access_token = login_data['access_token']
-        token_ins, created = AccessToken.objects.get_or_create(token=access_token)
-        if created == False:
-            token_ins.token = access_token
-            token_ins.save()
+        token_ins = AccessToken.objects.all().first()
+        token_ins.token = access_token
+        token_ins.save()
         return login_res.status_code, access_token
 
     # login_res may 401 Unauthorized
     else:
         return login_res.status_code, ''
+
+
+def create_invoices(data):
+    customer_id = data.get('customer_id')
+    invoice_date = data.get('invoice_date')
+    net_amounts = data.get('net_amounts')
+    send_method = data.get('send_method')  # Possible values: email, self
+    introduction = data.get('introduction')
+    payment_method = data.get('payment_method')  # Possible values: pay_later, direct_debit, already_paid
+    # print(payment_method, introduction, send_method, net_amounts, introduction, customer_id)
+    print(invoice_date[0])
+
+    # todo: items data
+    description = data.get('description')
+    vat_percentage = data.get('vat_percentage')
+    vat = data.get('vat')
+    # units = data.get('units')
+    number_of_units = data.get('number_of_units')
+    amount_per_unit_value = data.get('amount_per_unit_value')
+    amount_per_unit_currency = data.get('amount_per_unit_currency')
+    ledger_account_id = data.get('ledger_account_id')
+    # print(description, vat_percentage, vat, number_of_units, amount_per_unit_value, amount_per_unit_currency,
+    #       ledger_account_id, )
+
+    line_items = []
+    for i in range(len(description)):
+        temp = {
+            "description": description[i],
+            "vat_percentage": vat_percentage[i],
+            "vat": vat[i],
+            # // "units": 10.0,
+            "number_of_units": number_of_units[i],
+            "amount_per_unit": {
+                "value": amount_per_unit_value[i],
+                "currency": amount_per_unit_currency[i]
+            },
+            "ledger_account_id": ledger_account_id[i]
+        }
+        line_items.append(temp)
+    # print(line_items)
+
+    body_data = {
+        "customer_id": customer_id[0],
+        # "invoice_date": invoice_date[0],
+        "net_amounts": net_amounts[0],
+        "send_method": send_method[0],
+        "introduction": introduction[0],
+        "payment_method": payment_method[0],
+        "line_items": line_items
+    }
+    print(body_data)
+    # todo: create invoices
+    token_ins = AccessToken.objects.all().first()
+    invoice_url = settings.INVOICE_URL
+    headers = {
+        "Authorization": "Bearer " + token_ins.token if token_ins is not None else '',
+        "Content-Type": "application/json"
+    }
+    # return True, True
+    invoice_res = requests.post(url=invoice_url, data=body_data, headers=headers)
+    if invoice_res.status_code == 201:
+        return invoice_res.status_code, invoice_res.json()
+    else:
+        return invoice_res.status_code, invoice_res.json()

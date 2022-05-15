@@ -1,18 +1,25 @@
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from invoices.utils import get_ledger_accounts, get_customers, get_access_token
+from invoices.utils import get_ledger_accounts, get_customers, get_access_token, create_invoices
 from .models import *
-import requests
+from django.contrib import messages
 from . import get_invoices
 
 
 def get_updated_data(request):
     invoice_res = get_invoices.get_or_add_invoices()
-    return JsonResponse(data={"data": invoice_res}, status=200)
+    return redirect('admin/invoices/invoice/')
+    # return JsonResponse(data={"data": invoice_res}, status=200)
 
 
 def create_invoice(request):
-    # print(request.POST)
+    if request.method == "POST":
+        # print(dict(request.POST))
+        status, data = create_invoices(dict(request.POST))
+        messages.success(
+            request, f"{data}",
+        )
+        return render(request, '../templates/create_invoice.html')
     return render(request, '../templates/create_invoice.html')
 
 
@@ -39,3 +46,23 @@ def get_customer(request):
 # amount_per_unit_value
 # amount_per_unit_currency
 # ledger_account_id
+
+"""
+customer_id
+invoice_date
+net_amounts
+send_method
+introduction
+payment_method
+
+
+==============
+description
+vat_percentage
+vat
+units
+number_of_units
+amount_per_unit_value
+amount_per_unit_currency
+ledger_account_id
+"""
