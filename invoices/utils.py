@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import requests
 import json
 from django.conf import settings
@@ -99,11 +101,11 @@ def create_invoices(data):
         temp = {
             "description": description[i],
             "vat_percentage": vat_percentage[i],
-            "vat": vat[i],
+            "vat": int(vat[i]),
             # // "units": 10.0,
             "number_of_units": number_of_units[i],
             "amount_per_unit": {
-                "value": amount_per_unit_value[i],
+                "value": Decimal(amount_per_unit_value[i]),
                 "currency": amount_per_unit_currency[i]
             },
             "ledger_account_id": ledger_account_id[i]
@@ -113,8 +115,8 @@ def create_invoices(data):
 
     body_data = {
         "customer_id": customer_id[0],
-        # "invoice_date": invoice_date[0],
-        "net_amounts": net_amounts[0],
+        "invoice_date": invoice_date[0],
+        # "net_amounts": net_amounts[0],
         "send_method": send_method[0],
         "introduction": introduction[0],
         "payment_method": payment_method[0],
@@ -126,7 +128,7 @@ def create_invoices(data):
     invoice_url = settings.INVOICE_URL
     headers = {
         "Authorization": "Bearer " + token_ins.token if token_ins is not None else '',
-        "Content-Type": "application/json"
+        # "Content-Type": "application/json"
     }
     # return True, True
     invoice_res = requests.post(url=invoice_url, data=body_data, headers=headers)

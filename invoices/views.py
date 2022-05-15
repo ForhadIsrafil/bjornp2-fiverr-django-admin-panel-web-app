@@ -16,10 +16,14 @@ def create_invoice(request):
     if request.method == "POST":
         # print(dict(request.POST))
         status, data = create_invoices(dict(request.POST))
-        messages.success(
-            request, f"{data}",
-        )
-        return render(request, '../templates/create_invoice.html')
+        if status == 401:
+            get_access_token()
+            return redirect('invoices:create_invoice')
+        else:
+            messages.success(
+                request, f"{data}",
+            )
+            return render(request, '../templates/create_invoice.html')
     return render(request, '../templates/create_invoice.html')
 
 
