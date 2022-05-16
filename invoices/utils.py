@@ -6,6 +6,7 @@ from django.conf import settings
 from .models import *
 from datetime import datetime
 
+
 def get_customers():
     # todo: get access token
     # loging_url = settings.LOGIN_URL
@@ -82,7 +83,7 @@ def create_invoices(data):
     introduction = data.get('introduction')
     payment_method = data.get('payment_method')  # Possible values: pay_later, direct_debit, already_paid
     # print(payment_method, introduction, send_method, net_amounts, introduction, customer_id)
-    print(invoice_date[0])
+    # print(invoice_date[0])
 
     # todo: items data
     description = data.get('description')
@@ -100,38 +101,38 @@ def create_invoices(data):
     for i in range(len(description)):
         temp = {
             "description": description[i],
+            "number_of_units": number_of_units[i],
             "vat_percentage": vat_percentage[i],
             "vat": int(vat[i]),
-            # // "units": 10.0,
-            "number_of_units": number_of_units[i],
+
             "amount_per_unit": {
-                "value": Decimal(amount_per_unit_value[i]),
-                "currency": amount_per_unit_currency[i]
+                "value": "{:.2f}".format(Decimal(amount_per_unit_value[i])),
+                "currency": "EUR"
             },
             "ledger_account_id": ledger_account_id[i]
         }
         line_items.append(temp)
-    # print(line_items)
 
     body_data = {
         "customer_id": customer_id[0],
-        "invoice_date": invoice_date[0],
-        # "net_amounts": net_amounts[0],
+        # "invoice_date": "",
+        "net_amounts": False,  # net_amounts[0],
         "send_method": send_method[0],
         "introduction": introduction[0],
         "payment_method": payment_method[0],
         "line_items": line_items
     }
-    print(body_data)
+    print(json.dumps(body_data))
+
     # todo: create invoices
     token_ins = AccessToken.objects.all().first()
     invoice_url = settings.INVOICE_URL
     headers = {
         "Authorization": "Bearer " + token_ins.token if token_ins is not None else '',
-        # "Content-Type": "application/json"
+        "Content-Type": "application/json"
     }
     # return True, True
-    invoice_res = requests.post(url=invoice_url, data=body_data, headers=headers)
+    invoice_res = requests.post(url=invoice_url, json=body_data, headers=headers)
     if invoice_res.status_code == 201:
         return invoice_res.status_code, invoice_res.json()
     else:
