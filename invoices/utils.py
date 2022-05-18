@@ -97,42 +97,63 @@ def create_invoices(data):
     # print(description, vat_percentage, vat, number_of_units, amount_per_unit_value, amount_per_unit_currency,
     #       ledger_account_id, )
 
-    line_items = []
-    for i in range(len(description)):
-        temp = {
-            "description": description[i],
-            "number_of_units": number_of_units[i],
-            "vat_percentage": vat_percentage[i],
-            "vat": int(vat[i]),
+    # line_items = []
+    # for i in range(len(description)):
+    #     temp = {
+    #         "description": f"{description[i]}",
+    #         "number_of_units": f"{number_of_units[i]}",
+    #         "vat_percentage": f"{vat_percentage[i]}",
+    #         "amount_per_unit": {
+    #             "value": "{:.2f}".format(Decimal(amount_per_unit_value[i])),
+    #             "currency": "EUR"
+    #         },
+    #         "ledger_account_id": f"{ledger_account_id[i]}"
+    #     }
+    #     line_items.append(temp)
 
-            "amount_per_unit": {
-                "value": "{:.2f}".format(Decimal(amount_per_unit_value[i])),
-                "currency": "EUR"
-            },
-            "ledger_account_id": ledger_account_id[i]
-        }
-        line_items.append(temp)
-
-    body_data = {
-        "customer_id": customer_id[0],
-        # "invoice_date": "",
-        "net_amounts": False,  # net_amounts[0],
-        "send_method": send_method[0],
-        "introduction": introduction[0],
-        "payment_method": payment_method[0],
-        "line_items": line_items
-    }
-    print(json.dumps(body_data))
+    # body_data = {
+    #     "customer_id": f"{customer_id[0]}",
+    #     # "invoice_date": "",
+    #     "net_amounts": False,  # net_amounts[0],
+    #     "send_method": f"{send_method[0]}",
+    #     "introduction": f"{introduction[0]}",
+    #     "payment_method": f"{payment_method[0]}",
+    #     # "line_items": line_items
+    # }
 
     # todo: create invoices
+
     token_ins = AccessToken.objects.all().first()
     invoice_url = settings.INVOICE_URL
     headers = {
         "Authorization": "Bearer " + token_ins.token if token_ins is not None else '',
         "Content-Type": "application/json"
     }
-    # return True, True
-    invoice_res = requests.post(url=invoice_url, json=body_data, headers=headers)
+
+    data = {
+        "customer_id": f"{customer_id[0]}",
+        "invoice_date": f"{invoice_date[0]}",
+        # "net_amounts": f"",
+        "send_method": f"{send_method[0]}",
+        "introduction": f"{introduction[0]}",
+        "payment_method": f"{payment_method[0]}",
+        "line_items": [
+            {
+                "description": description[i],
+                "number_of_units": number_of_units[i],
+                "amount_per_unit": {
+                    "value": amount_per_unit_value[i],
+                    "currency": "EUR"
+                },
+                # "vat": vat[i],
+                "vat_percentage": "21.0",  #
+                "ledger_account_id": ledger_account_id[i]
+            } for i in range(len(description))
+        ],
+        "sold_via_platform": "false"
+    }
+    # print(json.loads(json.dumps(data, indent=4)))
+    invoice_res = requests.post(url=invoice_url, data=json.dumps(data, indent=4), headers=headers)
     if invoice_res.status_code == 201:
         return invoice_res.status_code, invoice_res.json()
     else:
