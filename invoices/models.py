@@ -10,6 +10,9 @@ class Invoice(models.Model):
     invoice_date_sent = models.DateField(null=True, blank=True)
     payment_method = models.CharField(max_length=50, null=True, blank=True)
 
+    def __str__(self):
+        return self.invoice_id
+
 
 class LineItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)

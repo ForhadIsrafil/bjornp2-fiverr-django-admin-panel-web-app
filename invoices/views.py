@@ -19,8 +19,17 @@ def create_invoice(request):
         if status == 401:
             get_access_token()
             return redirect('invoices:create_invoice')
-        else:
+        elif status == 201:
             messages.success(
+                request, f"Succesfully created new invoice!\n Invoice ID: {data['data']['id']}",
+            )
+            messages.success(
+                request, f"Invoice ID: {data['data']['id']}",
+            )
+            get_invoices.get_or_add_invoices()
+            return render(request, '../templates/create_invoice.html')
+        else:
+            messages.error(
                 request, f"{data}",
             )
             return render(request, '../templates/create_invoice.html')
