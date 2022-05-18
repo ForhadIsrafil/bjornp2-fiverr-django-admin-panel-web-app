@@ -152,7 +152,7 @@ def create_invoices(data):
         ],
         "sold_via_platform": "false"
     }
-    # print(json.loads(json.dumps(data, indent=4)))
+    print(json.loads(json.dumps(data, indent=4)))
     invoice_res = requests.post(url=invoice_url, data=json.dumps(data, indent=4), headers=headers)
     if invoice_res.status_code == 201:
         return invoice_res.status_code, invoice_res.json()

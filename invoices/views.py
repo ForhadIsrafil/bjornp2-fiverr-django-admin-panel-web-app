@@ -21,7 +21,7 @@ def create_invoice(request):
             return redirect('invoices:create_invoice')
         elif status == 201:
             messages.success(
-                request, f"Succesfully created new invoice!\n Invoice ID: {data['data']['id']}",
+                request, f"Succesfully created new invoice!",
             )
             messages.success(
                 request, f"Invoice ID: {data['data']['id']}",

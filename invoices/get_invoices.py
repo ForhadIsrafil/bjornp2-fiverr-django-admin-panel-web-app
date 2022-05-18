@@ -47,16 +47,17 @@ def get_or_add_invoices():
                     invoice_ins.save()
 
                     for item in line_items:
-                        description = line_items[0]['description']
-                        vat_percentage = line_items[0]['vat_percentage']
-                        vat = line_items[0]['vat']
-                        units = line_items[0]['units']
-                        number_of_units = line_items[0]['number_of_units']
+                        print(item)
+                        description = item['description']
+                        vat_percentage = item['vat_percentage']
+                        vat = item['vat']
+                        units = item['units']
+                        number_of_units = item['number_of_units']
 
-                        amount_per_unit_value = line_items[0]['amount_per_unit']['value']
-                        amount_per_unit_currency = line_items[0]['amount_per_unit']['currency']
+                        amount_per_unit_value = item['amount_per_unit']['value']
+                        amount_per_unit_currency = item['amount_per_unit']['currency']
 
-                        ledger_account_id = line_items[0]['ledger_account_id']
+                        ledger_account_id = item['ledger_account_id']
                         line_item_ins = LineItem(invoice=invoice_ins, description=description,
                                                  vat_percentage=vat_percentage, vat=vat, units=units,
                                                  number_of_units=number_of_units,
